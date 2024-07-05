@@ -1,11 +1,11 @@
 const router = require('express').Router();
-//package to generate unique id
+//package to generate unique id to save note with this unique id
 const generateUniqueID = require('generate-unique-id');
 // Destructure the methods from fsutils
 const { readFromFile, readAndWriteToFile, deleteNoteFromFile } = require('../utils/fsutils')
 
 
-// route defined to provide notes available
+// route defined to fetch notes available
 router.get('/notes', (req, res) => {
     readFromFile('./db/db.json')
         .then((data) => {
@@ -57,10 +57,11 @@ router.post('/notes', (req, res) => {
 router.delete('/notes/:id', (req, res) => {
     const id = req.params.id;
     if (id) {
+        // function defined to read notes, delete note and write remaining notes to file
         deleteNoteFromFile('./db/db.json', id)
             .then(result => {
                 if (result.statusCode === '200') {
-                    // Have to pass status code value instead of property reference to avoid express warning
+                    // Have to pass status code value instead of property reference to avoid express warning written to console
                     res.status(200).json(result)
                 }
                 else if (result.statusCode === '404') {

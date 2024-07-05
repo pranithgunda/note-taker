@@ -1,6 +1,6 @@
-// Install file system
+// Install file system package
 const fs = require("fs");
-// Install util
+// Install util package
 const util = require("util");
 
 // Promisify readFile and writeFile to return promise
@@ -14,7 +14,7 @@ async function readAndWriteToFile(fileName, note) {
         // Declare parsedData as array
         let parsedData = [];
         if (data) {
-            // parse file data to convert Javascript object of type array
+            // parse file data to convert into Javascript object of type array
             parsedData = JSON.parse(data);
             // push new note to array
             parsedData.push(note);
@@ -81,6 +81,7 @@ async function deleteNoteFromFile(fileName, id) {
             }
         }
     } catch (err) {
+        // In case of exceptions, log error to console
         console.log(err)
     }
 }
