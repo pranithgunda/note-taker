@@ -11,10 +11,16 @@ async function readAndWriteToFile(fileName, note) {
     try {
         // read data from file
         const data = await readFromFile(fileName, 'utf-8')
-        // parse file data to convert to Javascript object
-        const parsedData = JSON.parse(data);
-        // push new note to array
-        parsedData.push(note);
+        // Declare parsedData as array
+        let parsedData = [];
+        if (data) {
+            // parse file data to convert Javascript object of type array
+            parsedData = JSON.parse(data);
+            // push new note to array
+            parsedData.push(note);
+        } else {
+            parsedData.push(note);
+        }
         // Write to file passed
         await writeToFile(fileName, JSON.stringify(parsedData))
         // return added note as a result
@@ -24,4 +30,58 @@ async function readAndWriteToFile(fileName, note) {
         console.log(err)
     }
 }
-module.exports = { readFromFile, readAndWriteToFile }
+
+async function deleteNoteFromFile(fileName, id) {
+    try {
+        // read data from file
+        const data = await readFromFile(fileName, 'utf-8')
+        // Declare parsedData as array
+        let parsedData = [];
+        // function defined to filter out note by id
+        function filterById(note, id) {
+            if (note.id !== "" && note.id !== id) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if (data) {
+            // parse file data to convert to Javascript object of type array
+            parsedData = JSON.parse(data);
+        } else {
+            // If notes not available for deletion, return appropriate message and delete
+            return {
+                message: 'Notes not available for deletion',
+                statusCode: '200',
+                Notes: [{}]
+            }
+        }
+        const filteredData = parsedData.filter((note) => filterById(note, id))
+        if (filteredData.length === parsedData.length) {
+            return {
+                message: 'Note id entered for deletion is invalid',
+                statusCode: '404',
+                Notes: filteredData
+            }
+        }
+        else if (filteredData.length > 0) {
+            await writeToFile(fileName, JSON.stringify(filteredData));
+            return {
+                message: 'Note Deleted',
+                statusCode: '200',
+                Notes: filteredData
+            }
+        }
+        else {
+            await writeToFile(fileName, '')
+            return {
+                message: 'All Notes Deleted Successfully',
+                statusCode: '200',
+                Notes: [{}]
+            }
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
+module.exports = { readFromFile, readAndWriteToFile, deleteNoteFromFile }
